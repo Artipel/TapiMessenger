@@ -7,8 +7,14 @@ import messenger.server.model.Caller;
 import messenger.tapiconnector.TapiController;
 import org.springframework.stereotype.Controller;
 
+import java.util.HashMap;
+import java.util.Hashtable;
+
 @Controller
 public class MainController {
+
+    HashMap<String, String> sessionToPhone = new HashMap<>();
+    Hashtable<String, String> table = new Hashtable<>();
 
     private WebSocketController webSocketController;
 
@@ -27,21 +33,17 @@ public class MainController {
     public MainController() {
     }
 
-    public MainController(WebSocketController webSocketController, TapiController tapiController) {
-        this.webSocketController = webSocketController;
-        this.tapiController = tapiController;
-    }
-
     public void initNewCall(String from, String to) {
         tapiController.callTo(from, to);
     }
 
     public void registerNewListener(String sessionId, String number) {
+        sessionToPhone.put(number, sessionId);
         tapiController.listenFor(number);
     }
 
-    public void handleIncomingCall(String from, String to) {
-        webSocketController.notifyIncomingCall(getCallerData(from));
+    public void handleIncomingCall(String fromNumber, String toNumber) {
+        webSocketController.notifyIncomingCall(sessionToPhone.get(toNumber), getCallerData(fromNumber));
     }
 
     private Caller getCallerData(String number) {
