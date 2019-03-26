@@ -1,0 +1,83 @@
+#dialog{
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    left: calc(50% - 400px/2);
+    top: calc(50% - 400px/2);
+
+    background: #C2C2C2;
+}
+
+#avatar{
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 100px;
+    top: 18px;
+    border-radius: 100%;
+    background: #655286;
+}
+
+#field-name{
+    position: absolute;
+    width: 150px;
+    height: 33px;
+    left: 41px;
+    top: 250px;
+
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: normal;
+
+    color: #000000;
+}
+
+#field-number{
+    position: absolute;
+    width: 150px;
+    height: 33px;
+    left: 41px;
+    top: 300px;
+
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: normal;
+
+    color: #000000;
+}
+
+#name-and-surname{
+    position: absolute;
+    width: 220px;
+    height: 33px;
+    left: 157px;
+    top: 250px;
+
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: normal;
+
+    color: #000000;
+}
+
+#phone-number{
+    position: absolute;
+    width: 124px;
+    height: 33px;
+    left: 157px;
+    top: 300px;
+
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: normal;
+
+    color: #000000;
+}
