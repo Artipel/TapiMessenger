@@ -76,10 +76,12 @@ public class TapiController {
             System.out.println("Trying to send bytes over socket");
             String command = "LISTEN," + number;
             System.out.println("command: " + command);
-            outputStream.write(command.length() + 1);
-            printWriter.println(command);
+            if(outputStream != null)
+                outputStream.write(command.length() + 1);
+            if(printWriter != null)
+                printWriter.println(command);
             System.out.println("Sending bytes to C++ program");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         Thread t1 = new Thread(() -> {

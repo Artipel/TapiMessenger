@@ -42,7 +42,7 @@ function connect() {
         stompClient.subscribe('/topic/incoming-call', function (caller) {
             setCallerBadge(JSON.parse(caller.body));
         });
-        sendName("+48606413737");
+        sendName("734");
     });
 }
 
@@ -64,6 +64,10 @@ function sendName(number) {
     stompClient.send("/tapi/listen", {}, JSON.stringify({'number': number.toString()}));
 }
 
+function callTo() {
+    stompClient.send("/tapi/call", {}, JSON.stringify({'fromNumber': "734", 'toNumber': $("#name").val()}))
+}
+
 function showGreeting(message) {
     $("#greetings").append("<tr><td>" + message + "</td></tr>");
 }
@@ -74,6 +78,6 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
+    $( "#send" ).click(function() { callTo(); });
     $( "#close" ).click(function () { resetCallerBadge(); });
 });
