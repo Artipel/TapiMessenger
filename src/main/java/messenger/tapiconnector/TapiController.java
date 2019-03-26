@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Random;
 
 @Component
@@ -25,6 +27,7 @@ public class TapiController {
     private PrintWriter printWriter;
     private InputStream inputStream;
     private BufferedReader bufferedReader;
+    private DataOutputStream dataOutputStream;
 
     private final MainController mainController;
 
@@ -36,7 +39,7 @@ public class TapiController {
             printWriter = new PrintWriter(outputStream);
             inputStream = socket.getInputStream();
             bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-
+            dataOutputStream = new DataOutputStream(outputStream);
             Thread listeningThread = new Thread(() -> {
                 while(!Thread.interrupted()) {
                     try {
@@ -76,10 +79,19 @@ public class TapiController {
             System.out.println("Trying to send bytes over socket");
             String command = "LISTEN," + number;
             System.out.println("command: " + command);
-            if(outputStream != null)
-                outputStream.write(command.length() + 1);
-            if(printWriter != null)
+            ByteBuffer buffer = ByteBuffer.allocate(4);
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+            buffer.putInt(command.length() + 1);
+            if(outputStream != null) {
+                outputStream.write(buffer.array());
+                outputStream.flush();
+//                dataOutputStream.writeInt(command.length() + 1);
+//                dataOutputStream.flush();
+            }
+            if(printWriter != null) {
                 printWriter.println(command);
+                printWriter.flush();
+            }
             System.out.println("Sending bytes to C++ program");
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,7 +124,8 @@ public class TapiController {
             System.out.println("Trying to send bytes over socket");
             String command = "STOPLISTEN," + number;
             System.out.println("command: " + command);
-            outputStream.write(command.length() + 1);
+            dataOutputStream.writeInt(command.length() + 1);
+            dataOutputStream.flush();
             printWriter.println(command);
             System.out.println("Sending bytes to C++ program");
         } catch (IOException e) {
@@ -125,8 +138,8 @@ public class TapiController {
             System.out.println("Trying to send bytes over socket");
             String command = "CALL," + from + "," + to;
             System.out.print("command: " + command);
-            outputStream.write(command.length() + 1);
-            outputStream.flush();
+            dataOutputStream.writeInt(command.length() + 1);
+            dataOutputStream.flush();
             printWriter.print(command);
             System.out.println("Sending bytes to C++ program");
         } catch (IOException e) {
