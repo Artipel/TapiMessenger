@@ -25,7 +25,7 @@ function setConnected(connected) {
 function connect() {
     var socket = new SockJS('/tapi-messenger');
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
+    stompClient.connect('login', 'passwd', function (frame) {
 
         var url = stompClient.ws._transport.url;
         url = url.replace(
@@ -36,7 +36,10 @@ function connect() {
 
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/user/queue/incoming-call' + '-user' + url, function (caller) {
+        stompClient.subscribe('/user/queue/incoming-call-user' + url, function (caller) {
+            setCallerBadge(JSON.parse(caller.body));
+        });
+        stompClient.subscribe('/topic/incoming-call', function (caller) {
             setCallerBadge(JSON.parse(caller.body));
         });
         sendName("+48606413737");

@@ -24,7 +24,8 @@ public class WebSocketController {
     SimpMessagingTemplate template;
 
     public void notifyIncomingCall(String listenerSessionId, Caller caller) {
-        template.convertAndSendToUser(listenerSessionId, "/user/queue/specific-user/incoming-call", caller);
+        // template.convertAndSendToUser(listenerSessionId, "/user/queue/incoming-call", caller);
+        template.convertAndSend("/user/queue/incoming-call-user" + listenerSessionId, caller);
         // template.convertAndSend("/topic/incoming-call", caller);
     }
 
