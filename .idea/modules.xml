@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/MockTapiServer/MockTapiServer.iml" filepath="$PROJECT_DIR$/MockTapiServer/MockTapiServer.iml" />
       <module fileurl="file://$PROJECT_DIR$/TapiMessanger.iml" filepath="$PROJECT_DIR$/TapiMessanger.iml" />
     </modules>
   </component>

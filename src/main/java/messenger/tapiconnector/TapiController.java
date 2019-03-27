@@ -12,22 +12,11 @@ import java.util.Random;
 @Component
 public class TapiController {
 
-    enum OPCODE {
-        CALL,
-        LISTEN,
-        STOP_LISTEN,
-        NEW_CALL,
-        ERROR,
-        OK
-    }
-
     private Socket socket;
-
     private OutputStream outputStream;
     private PrintWriter printWriter;
     private InputStream inputStream;
     private BufferedReader bufferedReader;
-    private DataOutputStream dataOutputStream;
 
     private final MainController mainController;
 
@@ -39,7 +28,6 @@ public class TapiController {
             printWriter = new PrintWriter(outputStream);
             inputStream = socket.getInputStream();
             bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            dataOutputStream = new DataOutputStream(outputStream);
             Thread listeningThread = new Thread(() -> {
                 while(!Thread.interrupted()) {
                     try {
@@ -78,56 +66,16 @@ public class TapiController {
         try {
             System.out.println("Trying to send bytes over socket");
             String command = "LISTEN," + number;
-            System.out.println("command: " + command);
-            ByteBuffer buffer = ByteBuffer.allocate(4);
-            buffer.order(ByteOrder.LITTLE_ENDIAN);
-            buffer.putInt(command.length() + 1);
-            if(outputStream != null) {
-                outputStream.write(buffer.array());
-                outputStream.flush();
-//                dataOutputStream.writeInt(command.length() + 1);
-//                dataOutputStream.flush();
-            }
-            if(printWriter != null) {
-                printWriter.println(command);
-                printWriter.flush();
-            }
-            System.out.println("Sending bytes to C++ program");
+            sendMessage(command);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Thread t1 = new Thread(() -> {
-            try {
-                for (int i = 0; i < 5; i++) {
-                    Thread.sleep(5000);
-                    switch(i % 3){
-                        case 0:
-                            incomingPhonecall("601501401", number);
-                            break;
-                        case 1:
-                            incomingPhonecall("602502402", number);
-                            break;
-                        case 2:
-                            incomingPhonecall("603503403", number);
-                            break;
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-        t1.start();
     }
 
     public void stopListenFor(String number){
         try {
-            System.out.println("Trying to send bytes over socket");
             String command = "STOPLISTEN," + number;
-            System.out.println("command: " + command);
-            dataOutputStream.writeInt(command.length() + 1);
-            dataOutputStream.flush();
-            printWriter.println(command);
-            System.out.println("Sending bytes to C++ program");
+            sendMessage(command);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -135,13 +83,8 @@ public class TapiController {
 
     public void callTo(String from, String to){
         try {
-            System.out.println("Trying to send bytes over socket");
             String command = "CALL," + from + "," + to;
-            System.out.print("command: " + command);
-            dataOutputStream.writeInt(command.length() + 1);
-            dataOutputStream.flush();
-            printWriter.print(command);
-            System.out.println("Sending bytes to C++ program");
+            sendMessage(command);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -151,5 +94,22 @@ public class TapiController {
         mainController.handleIncomingCall(from, to);
     }
 
+    private byte[] getMessageLength(String msg) {
+        ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(msg.length());
+        return buffer.array();
+    }
+
+    private void sendMessage(String msg) throws IOException {
+        if(outputStream != null) {
+            outputStream.write(getMessageLength(msg));
+            outputStream.flush();
+        }
+        if(printWriter != null) {
+            printWriter.print(msg);
+            printWriter.flush();
+        }
+    }
 
 }
