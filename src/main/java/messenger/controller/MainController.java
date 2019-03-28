@@ -9,12 +9,12 @@ import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Random;
 
 @Controller
 public class MainController {
 
     HashMap<String, String> sessionToPhone = new HashMap<>();
-    Hashtable<String, String> table = new Hashtable<>();
 
     private WebSocketController webSocketController;
 
@@ -37,13 +37,18 @@ public class MainController {
         tapiController.callTo(from, to);
     }
 
-    public void registerNewListener(String sessionId, String number) {
+    public void registerNewListener(String sessionId) {
+        String number = getNumberFromSessionFromDB(sessionId);
         sessionToPhone.put(number, sessionId);
         tapiController.listenFor(number);
     }
 
     public void handleIncomingCall(String fromNumber, String toNumber) {
         webSocketController.notifyIncomingCall(sessionToPhone.get(toNumber), getCallerData(fromNumber));
+    }
+
+    private String getNumberFromSessionFromDB(String sessionId) {
+        return "734";
     }
 
     private Caller getCallerData(String number) {

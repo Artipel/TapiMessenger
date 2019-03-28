@@ -31,9 +31,9 @@ public class WebSocketController {
 
     @MessageMapping("/listen")
     @SendTo("/topic/is-listen-init")
-    public String startListen(@Payload ListenMessage message, @Header("simpSessionId") String sessionId) {
-        System.out.println("Received request to listen for " + message.getNumber());
-        mainController.registerNewListener(sessionId, message.getNumber());
+    public String startListen(@Header("simpSessionId") String sessionId) { //getNumberFromSessionFromDB(sessionId)
+        System.out.println("Received request to listen for session" + sessionId);
+        mainController.registerNewListener(sessionId);
         return "LISTENING STARTED";
     }
 

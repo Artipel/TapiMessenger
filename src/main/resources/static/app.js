@@ -42,6 +42,7 @@ function connect() {
         stompClient.subscribe('/topic/incoming-call', function (caller) {
             setCallerBadge(JSON.parse(caller.body));
         });
+        stompClient.subscribe('/topic/is-listen-init', function (resp) { });
         sendName("734");
     });
 }
@@ -61,7 +62,8 @@ function sendName() {
 
 function sendName(number) {
     //stompClient.send("/app/hello", {}, JSON.stringify({'name': $("#name").val()}));
-    stompClient.send("/tapi/listen", {}, JSON.stringify({'number': number.toString()}));
+    //stompClient.send("/tapi/listen", {}, JSON.stringify({'number': number.toString()}));
+    stompClient.send("/tapi/listen", {}, "");
 }
 
 function callTo() {
