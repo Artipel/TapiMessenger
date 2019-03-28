@@ -25,11 +25,12 @@ function setConnected(connected) {
 function connect() {
     var socket = new SockJS('/tapi-messenger');
     stompClient = Stomp.over(socket);
-    stompClient.connect('login', 'passwd', function (frame) {
+    stompClient.connect('mylogin', 'mypasswd', function (frame) {
 
         var url = stompClient.ws._transport.url;
+        url = url.replace("http","").replace("ws","");
         url = url.replace(
-            "ws://localhost:8081/tapi-messenger/",  "");
+            "://localhost:8081/tapi-messenger/",  "");
         url = url.replace("/websocket", "");
         url = url.replace(/^[0-9]+\//, "");
         console.log("Your current session is: " + url);
