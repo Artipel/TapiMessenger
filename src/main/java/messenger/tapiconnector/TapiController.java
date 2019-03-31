@@ -102,13 +102,13 @@ public class TapiController {
     }
 
     private void sendMessage(String msg) throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocate(256);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(msg.length());
+        buffer.put(msg.getBytes());
         if(outputStream != null) {
-            outputStream.write(getMessageLength(msg));
+            outputStream.write(buffer.array());
             outputStream.flush();
-        }
-        if(printWriter != null) {
-            printWriter.print(msg);
-            printWriter.flush();
         }
     }
 
