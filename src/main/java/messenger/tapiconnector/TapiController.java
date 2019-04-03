@@ -7,64 +7,41 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Random;
 
 @Component
 public class TapiController {
 
     private Socket socket;
     private OutputStream outputStream;
-    private PrintWriter printWriter;
     private InputStream inputStream;
     private BufferedReader bufferedReader;
+    private ListeningThread listeningThread;
 
     private final MainController mainController;
 
+    private final String HOST = "localhost";
+    private final int PORT = 44444;
+
     public TapiController(MainController mainController) {
         this.mainController = mainController;
-        try {
-            socket = new Socket("localhost", 44444);
-            outputStream = socket.getOutputStream();
-            printWriter = new PrintWriter(outputStream);
-            inputStream = socket.getInputStream();
-            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            Thread listeningThread = new Thread(() -> {
-                while(!Thread.interrupted()) {
-                    try {
-                        String line = bufferedReader.readLine();
-                        System.out.println("Read from TAPI: " + line);
-                        String command = line.split(",")[0];
-                        switch (command) {
-                            case "NEWCALL":
-                                String[] arguments = line.split(",");
-                                if (arguments.length > 2)
-                                    incomingPhonecall(arguments[1], arguments[2]);
-                                break;
-                            case "ERROR":
-                                System.out.println("Error reported from TAPI");
-                                break;
-                            case "OK":
-                                System.out.println("Tapi accepts message");
-                                break;
-                            default:
-                                System.out.println("Unknown message from TAPI: " + line);
-                                break;
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        while(socket == null || !socket.isConnected()) {
+            try {
+                initSocketAndStream();
+                listeningThread = new ListeningThread();
+                listeningThread.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
                 }
-            });
-
-            listeningThread.start();
-        } catch (IOException e) {
-            e.printStackTrace();
+            }
         }
     }
 
     public void listenFor(String number){
         try {
-            System.out.println("Trying to send bytes over socket");
             String command = "LISTEN," + number;
             sendMessage(command);
         } catch (Exception e) {
@@ -107,8 +84,46 @@ public class TapiController {
         buffer.putInt(msg.length());
         buffer.put(msg.getBytes());
         if(outputStream != null) {
-            outputStream.write(buffer.array());
+            outputStream.write(buffer.array(), 0, buffer.position());
             outputStream.flush();
+        }
+    }
+
+    private void initSocketAndStream() throws IOException {
+        socket = new Socket(HOST, PORT);
+        outputStream = socket.getOutputStream();
+        inputStream = socket.getInputStream();
+        bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+    }
+
+    private class ListeningThread extends Thread{
+        @Override
+        public void run() {
+            while(!Thread.interrupted()) {
+                try {
+                    String line = bufferedReader.readLine();
+                    System.out.println("Read from TAPI: " + line);
+                    String command = line.split(",")[0];
+                    switch (command) {
+                        case "NEWCALL":
+                            String[] arguments = line.split(",");
+                            if (arguments.length > 2)
+                                incomingPhonecall(arguments[1], arguments[2]);
+                            break;
+                        case "ERROR":
+                            System.out.println("Error reported from TAPI");
+                            break;
+                        case "OK":
+                            System.out.println("Tapi accepts message");
+                            break;
+                        default:
+                            System.out.println("Unknown message from TAPI: " + line);
+                            break;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

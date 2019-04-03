@@ -3,6 +3,8 @@ import com.sun.security.ntlm.Server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class TapiServer {
 
@@ -16,7 +18,7 @@ public class TapiServer {
 
         try {
             initSocketAndStream(44444);
-//
+
 //            server = new ServerSocket(44444);
 //            System.out.println("Mock server: running on port 44444");
 //            socket = server.accept();
@@ -26,7 +28,11 @@ public class TapiServer {
 
             while(true) {
                 char[] buffer = new char[4];
-                reader.read(buffer, 0, 4);
+                ByteBuffer byteBuffer = ByteBuffer.allocate(4);
+                byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+                int readBytes;
+                readBytes = reader.read(buffer, 0, 4);
+                byteBuffer.getInt(0);
                 int size = (int)buffer[0];
                 buffer = new char[size];
                 reader.read(buffer, 0, size);
