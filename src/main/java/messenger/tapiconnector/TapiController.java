@@ -101,7 +101,12 @@ public class TapiController {
         public void run() {
             while(!Thread.interrupted()) {
                 try {
-                    String line = bufferedReader.readLine();
+                    char[] buffer = new char[4];
+                    bufferedReader.read(buffer, 0, 4);
+                    buffer = new char[(int)buffer[0]];
+                    bufferedReader.read(buffer, 0, buffer.length);
+                    String line = new String(buffer);
+                    // String line = bufferedReader.readLine();
                     System.out.println("Read from TAPI: " + line);
                     String command = line.split(",")[0];
                     switch (command) {
