@@ -96,22 +96,30 @@ public class TapiController {
         bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
     }
 
+    private String readSocketLine() throws IOException {
+        char[] buffer = new char[4];
+        int bytesRead = bufferedReader.read(buffer, 0, 4);
+        if(bytesRead < 4)
+            throw new IOException("Wrong number of bytes read");
+        buffer = new char[(int)buffer[0]];
+        bytesRead = bufferedReader.read(buffer, 0, buffer.length);
+        if(bytesRead < buffer.length)
+            throw new IOException("Wrong number of bytes read");
+        return new String(buffer);
+    }
+
     private class ListeningThread extends Thread{
         @Override
         public void run() {
             while(!Thread.interrupted()) {
                 try {
-                    char[] buffer = new char[4];
-                    bufferedReader.read(buffer, 0, 4);
-                    buffer = new char[(int)buffer[0]];
-                    bufferedReader.read(buffer, 0, buffer.length);
-                    String line = new String(buffer);
+                    String line = readSocketLine();
                     // String line = bufferedReader.readLine();
                     System.out.println("Read from TAPI: " + line);
-                    String command = line.split(",")[0];
+                    String[] arguments = line.split(",");
+                    String command = arguments[0];
                     switch (command) {
                         case "NEWCALL":
-                            String[] arguments = line.split(",");
                             if (arguments.length > 2)
                                 incomingPhonecall(arguments[1], arguments[2]);
                             break;

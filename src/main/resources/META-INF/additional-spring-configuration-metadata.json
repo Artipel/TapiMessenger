@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "tapi.port",
+      "type": "java.lang.String",
+      "description": "Port of the Tapi Server."
+    },
+    {
+      "name": "tapi.ip",
+      "type": "java.lang.String",
+      "description": "IP address of the Tapi Server."
+    }
+  ]
+}

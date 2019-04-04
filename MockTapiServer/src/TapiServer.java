@@ -85,10 +85,12 @@ public class TapiServer {
 
     private static void incomingPhonecall(String from, String to) {
         System.out.println("New incoming phonecall from: " + from + " to: " + to);
-        PrintWriter writer = new PrintWriter(out);
         System.out.println("Command: " + "NEWCALL,"+from+","+to);
-        writer.println("NEWCALL,"+from+","+to);
-        writer.flush();
+        try {
+            sendMessage("NEWCALL,"+from+","+to);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void initSocketAndStream(int port) throws IOException {
@@ -98,6 +100,17 @@ public class TapiServer {
         in = socket.getInputStream();
         out = socket.getOutputStream();
         reader = new BufferedReader(new InputStreamReader(in));
+    }
+
+    private static void sendMessage(String msg) throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocate(256);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(msg.length());
+        buffer.put(msg.getBytes());
+        if(out != null) {
+            out.write(buffer.array(), 0, buffer.position());
+            out.flush();
+        }
     }
 
 }

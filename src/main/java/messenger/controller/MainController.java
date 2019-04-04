@@ -47,8 +47,10 @@ public class MainController {
         webSocketController.notifyIncomingCall(sessionToPhone.get(toNumber), getCallerData(fromNumber));
     }
 
+    int debugIterator = 0;
+
     private String getNumberFromSessionFromDB(String sessionId) {
-        return "734";
+        return debugIterator++ % 2 == 0 ? "734" : "791" ;
     }
 
     private Caller getCallerData(String number) {

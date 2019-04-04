@@ -79,6 +79,7 @@ $(function () {
         e.preventDefault();
     });
     $( "#connect" ).click(function() { connect(); });
+    $( "#connect2" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
     $( "#send" ).click(function() { callTo(); });
     $( "#close" ).click(function () { resetCallerBadge(); });
