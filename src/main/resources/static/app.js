@@ -67,7 +67,7 @@ function sendName(number) {
 }
 
 function callTo() {
-    stompClient.send("/tapi/call", {}, JSON.stringify({'fromNumber': "734", 'toNumber': $("#name").val()}))
+    stompClient.send("/tapi/call", {}, JSON.stringify({'toNumber': $("#name").val()}))
 }
 
 function showGreeting(message) {
