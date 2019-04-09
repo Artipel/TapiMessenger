@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import messenger.server.model.Caller;
 import messenger.server.model.messages.CallMessage;
 import messenger.server.model.messages.ListenMessage;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.security.Principal;
 
@@ -29,6 +30,7 @@ public class WebSocketController {
         // template.convertAndSend("/topic/incoming-call", caller);
     }
 
+    @CrossOrigin(origins = "http://172.16.35.185:7070")
     @MessageMapping("/listen")
     @SendTo("/topic/is-listen-init")
     public String startListen(@Header("simpSessionId") String sessionId) { //getNumberFromSessionFromDB(sessionId)
@@ -37,6 +39,7 @@ public class WebSocketController {
         return "LISTENING STARTED";
     }
 
+    @CrossOrigin(origins = "http://172.16.35.185:7070")
     @MessageMapping("/call")
     @SendTo("/topic/is-call-init")
     public String initiateCall(CallMessage message, @Header("simpSessionId") String sessionId) {
