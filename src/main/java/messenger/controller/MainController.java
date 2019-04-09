@@ -14,8 +14,7 @@ import java.util.Random;
 @Controller
 public class MainController {
 
-    HashMap<String, String> sessionToPhone = new HashMap<>();
-    HashMap<String, String> phoneToSession = new HashMap<>();
+    SessionPhoneMap map = new SessionPhoneMap();
 
     private WebSocketController webSocketController;
 
@@ -35,24 +34,25 @@ public class MainController {
     }
 
     public void initNewCall(String sessionId, String to) {
-        tapiController.callTo(sessionToPhone.get(sessionId), to);
+        tapiController.callTo(map.getPhone(sessionId), to);
     }
 
     public void registerNewListener(String sessionId) {
         String number = getNumberFromSessionFromDB(sessionId);
-        sessionToPhone.put(sessionId, number);
-        phoneToSession.put(number, sessionId);
-        tapiController.listenFor(number);
+        boolean overwrite = map.addPair(number, sessionId);
+        if(!overwrite)
+            tapiController.listenFor(number);
     }
 
     public void handleIncomingCall(String fromNumber, String toNumber) {
-        webSocketController.notifyIncomingCall(phoneToSession.get(toNumber), getCallerData(fromNumber));
+        webSocketController.notifyIncomingCall(map.getSession(toNumber), getCallerData(fromNumber));
     }
 
     int debugIterator = 0;
 
     private String getNumberFromSessionFromDB(String sessionId) {
-        return debugIterator++ % 2 == 0 ? "734" : "791" ;
+        return "734";
+        // return debugIterator++ % 2 == 0 ? "734" : "791" ;
     }
 
     private Caller getCallerData(String number) {
