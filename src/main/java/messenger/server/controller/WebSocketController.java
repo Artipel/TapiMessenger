@@ -33,10 +33,16 @@ public class WebSocketController {
     @CrossOrigin(origins = "http://172.16.35.185:7070")
     @MessageMapping("/listen")
     @SendTo("/topic/is-listen-init")
-    public String startListen(@Header("simpSessionId") String sessionId) { //getNumberFromSessionFromDB(sessionId)
+    public String startListen(@Header("simpSessionId") String sessionId, @Header("apex_session") String apexSession) { //getNumberFromSessionFromDB(sessionId)
         System.out.println("Received request to listen for session: " + sessionId);
-        mainController.registerNewListener(sessionId);
+        mainController.registerNewListener(apexSession, apexSession);
         return "LISTENING STARTED";
+    }
+
+    @MessageMapping("/stop")
+    public void stopListen(@Header("simpSessionId") String sessionId) {
+        System.out.println("Received request to STOP listen for session: " + sessionId);
+        mainController.stopListen(sessionId);
     }
 
     @CrossOrigin(origins = "http://172.16.35.185:7070")

@@ -37,11 +37,19 @@ public class MainController {
         tapiController.callTo(map.getPhone(sessionId), to);
     }
 
-    public void registerNewListener(String sessionId) {
-        String number = getNumberFromSessionFromDB(sessionId);
+    public void registerNewListener(String sessionId, String applicationSession) {
+        String number = getNumberFromSessionFromDB(applicationSession);
         boolean overwrite = map.addPair(number, sessionId);
         if(!overwrite)
             tapiController.listenFor(number);
+    }
+
+    public void stopListen(String sessionId) {
+        String number = map.getPhone(sessionId);
+        if(number != null) {
+            tapiController.stopListenFor(number);
+            map.deletePairBySession(sessionId);
+        }
     }
 
     public void handleIncomingCall(String fromNumber, String toNumber) {

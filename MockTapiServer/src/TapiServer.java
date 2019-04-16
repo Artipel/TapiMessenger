@@ -62,17 +62,17 @@ public class TapiServer {
     private static void startListening(String number) {
         Thread t0 = new Thread(() -> {
             try {
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 1000; i++) {
                     Thread.sleep(10000);
                     switch (i % 3) {
                         case 0:
-                            incomingPhonecall("601501401", number);
+                            incomingPhonecall("0606413737", number);
                             break;
                         case 1:
-                            incomingPhonecall("602502402", number);
+                            incomingPhonecall("444555666", number);
                             break;
                         case 2:
-                            incomingPhonecall("603503403", number);
+                            incomingPhonecall("123654789", number);
                             break;
                     }
                 }
