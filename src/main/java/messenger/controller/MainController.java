@@ -40,11 +40,18 @@ public class MainController {
         tapiController.callTo(map.getPhone(sessionId), to);
     }
 
-    public void registerNewListener(String sessionId, String applicationSession) {
+    /**
+     * Update session to phone map. If new phone then starts listening on Tapi Server.
+     * @param sessionId
+     * @param applicationSession
+     * @return phone number associated with this session
+     */
+    public String registerNewListener(String sessionId, String applicationSession) {
         String number = getNumberFromSessionFromDB(applicationSession);
         boolean overwrite = map.addPair(number, sessionId);
         if(!overwrite)
             tapiController.listenFor(number);
+        return number;
     }
 
     public void stopListen(String sessionId) {

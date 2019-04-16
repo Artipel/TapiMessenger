@@ -35,8 +35,8 @@ public class WebSocketController {
     @SendTo("/topic/is-listen-init")
     public String startListen(@Header("simpSessionId") String sessionId, @Header("apex_session") String apexSession) { //getNumberFromSessionFromDB(sessionId)
         System.out.println("Received request to listen for session: " + apexSession);
-        mainController.registerNewListener(apexSession, apexSession);
-        return "LISTENING STARTED";
+        String number = mainController.registerNewListener(apexSession, apexSession);
+        return "LISTENING STARTED for number: " + number;
     }
 
     @MessageMapping("/stop")

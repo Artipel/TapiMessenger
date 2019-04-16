@@ -37,7 +37,7 @@ function setConnecting() {
 }
 
 function connect() {
-    var socket = new SockJS('localhost:8081/tapi-messenger'); //172.16.35.51:8081
+    var socket = new SockJS('172.16.35.51:8081/tapi-messenger'); //172.16.35.51:8081
     stompClient = Stomp.over(socket);
     stompClient.connect('mylogin', 'mypasswd', function (frame) {
 
@@ -56,7 +56,7 @@ function connect() {
         stompClient.subscribe('/user/queue/incoming-call-user' + url, function (caller) {
             setCallerBadge(JSON.parse(caller.body));
         });
-        stompClient.subscribe('/topic/is-listen-init', function (resp) { });
+        stompClient.subscribe('/topic/is-listen-init', function (resp) { console.log(resp); });
         stompClient.subscribe('/user/queue/incoming-call-user' + apexSession, function (caller) {
             setCallerBadge(JSON.parse(caller.body));
         });
