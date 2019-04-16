@@ -21,6 +21,9 @@ public class MainController {
     private TapiController tapiController; // = new TapiController(this);
 
     @Autowired
+    private DBController dbController;
+
+    @Autowired
     public void setWebSocketController(WebSocketController webSocketController) {
         this.webSocketController = webSocketController;
     }
@@ -59,7 +62,7 @@ public class MainController {
     int debugIterator = 0;
 
     private String getNumberFromSessionFromDB(String sessionId) {
-        return "734";
+        return dbController.getNumberFromSession(sessionId);
         // return debugIterator++ % 2 == 0 ? "734" : "791" ;
     }
 

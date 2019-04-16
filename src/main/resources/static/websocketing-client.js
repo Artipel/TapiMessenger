@@ -37,7 +37,7 @@ function setConnecting() {
 }
 
 function connect() {
-    var socket = new SockJS('172.16.35.51:8081/tapi-messenger'); //172.16.35.51:8081
+    var socket = new SockJS('localhost:8081/tapi-messenger'); //172.16.35.51:8081
     stompClient = Stomp.over(socket);
     stompClient.connect('mylogin', 'mypasswd', function (frame) {
 
