@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.HashMap;
 
 public class TapiServer {
 
@@ -13,6 +14,8 @@ public class TapiServer {
     static InputStream in;
     static OutputStream out;
     static BufferedReader reader;
+
+    static HashMap<String, Thread> listeningThreads = new HashMap<>();
 
     public static void main(String[] args) {
 
@@ -56,7 +59,14 @@ public class TapiServer {
             case "LISTEN":
                 startListening(arguments[0]);
                 break;
+            case "STOPLISTEN":
+                stopListening(arguments[0]);
+                break;
         }
+    }
+
+    private static void stopListening(String number) {
+        listeningThreads.get(number).interrupt();
     }
 
     private static void startListening(String number) {
@@ -77,10 +87,11 @@ public class TapiServer {
                     }
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         });
         t0.start();
+        listeningThreads.put(number, t0);
     }
 
     private static void incomingPhonecall(String from, String to) {

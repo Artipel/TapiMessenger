@@ -25,7 +25,7 @@ function setConnected(connected) {
 function connect() {
     var socket = new SockJS('/tapi-messenger');
     stompClient = Stomp.over(socket);
-    stompClient.connect('login', 'passwd', function (frame) {
+    stompClient.connect({'simpSessionId': 1111}, function (frame) {
 
         var url = stompClient.ws._transport.url;
         url = url.replace(

@@ -1,15 +1,12 @@
 package messenger.controller;
 
+import messenger.server.config.WebSocketConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import messenger.server.controller.WebSocketController;
 import messenger.server.model.Caller;
 import messenger.tapiconnector.TapiController;
 import org.springframework.stereotype.Controller;
-
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Random;
 
 @Controller
 public class MainController {
@@ -19,6 +16,8 @@ public class MainController {
     private WebSocketController webSocketController;
 
     private TapiController tapiController; // = new TapiController(this);
+
+    private WebSocketConfig webSocketConfig;
 
     @Autowired
     private DBController dbController;
@@ -31,6 +30,16 @@ public class MainController {
     @Autowired
     public void setTapiController(TapiController tapiController) {
         this.tapiController = tapiController;
+    }
+
+    @Autowired
+    public void setWebSocketConfig(WebSocketConfig webSocketConfig) {
+        this.webSocketConfig = webSocketConfig;
+
+        this.webSocketConfig.setDisconnectionHandler(event -> {
+            StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
+            unregisterListener(sha.getSessionId());
+        });
     }
 
     public MainController() {
@@ -54,23 +63,34 @@ public class MainController {
         return number;
     }
 
-    public void stopListen(String sessionId) {
+    public void unregisterListener(String sessionId) {
         String number = map.getPhone(sessionId);
+        if (number != null) {
+            System.out.println("Unregistering listener with sessionId: " + sessionId + " from listening on number: " + number);
+            if (map.deleteSession(sessionId) == 0) {
+                System.out.println("Last listener on number: " + number + " disconnected. Stop listen tapi server.");
+                stopListen(number); // No more listeners. Tapi Server can stop sending data.
+            }
+        }
+    }
+
+    public void stopListen(String number) {
         if(number != null) {
             tapiController.stopListenFor(number);
-            map.deletePairBySession(sessionId);
         }
     }
 
     public void handleIncomingCall(String fromNumber, String toNumber) {
-        webSocketController.notifyIncomingCall(map.getSession(toNumber), getCallerData(fromNumber));
+        String[] sessions = new String[map.getSessionsCount(toNumber)];
+        map.getSessions(toNumber).toArray(sessions); // This one is to avoid concurrent modification exception
+        for (String session :
+                sessions) {
+            webSocketController.notifyIncomingCall(session, getCallerData(fromNumber));
+        }
     }
-
-    int debugIterator = 0;
 
     private String getNumberFromSessionFromDB(String sessionId) {
         return dbController.getNumberFromSession(sessionId);
-        // return debugIterator++ % 2 == 0 ? "734" : "791" ;
     }
 
     private Caller getCallerData(String number) {

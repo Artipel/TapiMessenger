@@ -25,32 +25,28 @@ public class WebSocketController {
     SimpMessagingTemplate template;
 
     public void notifyIncomingCall(String listenerSessionId, Caller caller) {
-        // template.convertAndSendToUser(listenerSessionId, "/user/queue/incoming-call", caller);
         template.convertAndSend("/user/queue/incoming-call-user" + listenerSessionId, caller);
-        // template.convertAndSend("/topic/incoming-call", caller);
     }
 
-    @CrossOrigin(origins = "http://172.16.35.185:7070")
     @MessageMapping("/listen")
     @SendTo("/topic/is-listen-init")
     public String startListen(@Header("simpSessionId") String sessionId, @Header("apex_session") String apexSession) { //getNumberFromSessionFromDB(sessionId)
-        System.out.println("Received request to listen for session: " + apexSession);
-        String number = mainController.registerNewListener(apexSession, apexSession);
+        System.out.println("Received request to listen for session: " + sessionId + " apex session: " + apexSession);
+        String number = mainController.registerNewListener(sessionId, apexSession);
         return "LISTENING STARTED for number: " + number;
     }
 
     @MessageMapping("/stop")
     public void stopListen(@Header("simpSessionId") String sessionId, @Header("apex_session") String apexSession) {
-        System.out.println("Received request to STOP listen for session: " + apexSession);
+        System.out.println("Received request to STOP listen for session: " + sessionId + " apex session: " + apexSession);
         mainController.stopListen(apexSession);
     }
 
-    @CrossOrigin(origins = "http://172.16.35.185:7070")
     @MessageMapping("/call")
     @SendTo("/topic/is-call-init")
-    public String initiateCall(CallMessage message, @Header("apex_session") String sessionId) {
-        System.out.println("Received request to call to " + message.getToNumber() + " from sessionID: " + sessionId);
-        mainController.initNewCall(sessionId, message.getToNumber());
+    public String initiateCall(CallMessage message, @Header("apex_session") String apexSession) {
+        System.out.println("Received request to call to " + message.getToNumber() + " from sessionID: " + apexSession);
+        mainController.initNewCall(apexSession, message.getToNumber());
         return "CALLING NUMBER " + message.getToNumber();
     }
 }

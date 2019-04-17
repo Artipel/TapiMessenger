@@ -11,7 +11,6 @@ public class DBController {
     JdbcTemplate jdbcTemplate;
 
     public String getNumberFromSession(String session) {
-        System.out.println(jdbcTemplate);
         String result = jdbcTemplate.query("SELECT telefon " +
                 "FROM " +
                 "adm$uzytkownicy WHERE konto = ( SELECT user_name FROM APEX_WORKSPACE_SESSIONS WHERE apex_session_id = ? )", new Object[]{ session },
