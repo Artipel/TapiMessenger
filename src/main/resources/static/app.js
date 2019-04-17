@@ -72,7 +72,7 @@ function introduce(session) {
 }
 
 function callTo() {
-    stompClient.send("/tapi/call", {}, JSON.stringify({'toNumber': $("#name").val()}))
+    stompClient.send("/tapi/call", {'apex_session': 11112222}, JSON.stringify({'toNumber': $("#name").val()}))
 }
 
 function showGreeting(message) {

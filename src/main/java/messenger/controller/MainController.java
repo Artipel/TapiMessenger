@@ -45,8 +45,12 @@ public class MainController {
     public MainController() {
     }
 
-    public void initNewCall(String sessionId, String to) {
-        tapiController.callTo(map.getPhone(sessionId), to);
+    public void initNewCall(String sessionId, String toNumber) {
+        String fromNumber = map.getPhone(sessionId);
+        if (fromNumber != null)
+            tapiController.callTo(fromNumber, toNumber);
+        else
+            System.out.println("No number associated with sessionId: " + sessionId);
     }
 
     /**

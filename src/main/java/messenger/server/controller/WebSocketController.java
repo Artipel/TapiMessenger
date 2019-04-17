@@ -44,9 +44,9 @@ public class WebSocketController {
 
     @MessageMapping("/call")
     @SendTo("/topic/is-call-init")
-    public String initiateCall(CallMessage message, @Header("apex_session") String apexSession) {
-        System.out.println("Received request to call to " + message.getToNumber() + " from sessionID: " + apexSession);
-        mainController.initNewCall(apexSession, message.getToNumber());
+    public String initiateCall(CallMessage message, @Header("simpSessionId") String sessionId, @Header("apex_session") String apexSession) {
+        System.out.println("Received request to call to " + message.getToNumber() + " from sessionID: " + sessionId + " at apex session: " + apexSession);
+        mainController.initNewCall(sessionId, message.getToNumber());
         return "CALLING NUMBER " + message.getToNumber();
     }
 }
