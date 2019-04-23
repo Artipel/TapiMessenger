@@ -5,7 +5,11 @@ package messenger.controller;
  * From implemented database connection information about phone number will be retrieved.
  */
 public interface DBController {
-
-    public String getNumberFromSession(String session);
+    /**
+     * Evaluate phone number of a user with given session id.
+     * @param session application session of a user
+     * @return phone number
+     */
+    String getNumberFromSession(String session) throws Exception;
 
 }

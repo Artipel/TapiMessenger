@@ -1,6 +1,7 @@
 package messenger.tapiconnector;
 
 import messenger.controller.MainController;
+import messenger.controller.NewCallHandler;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -17,27 +18,31 @@ public class TapiController {
     private BufferedReader bufferedReader;
     private ListeningThread listeningThread;
 
-    private final MainController mainController;
+    private NewCallHandler newCallHandler;
 
     private final String HOST = "localhost";
     private final int PORT = 44444;
 
-    public TapiController(MainController mainController) {
-        this.mainController = mainController;
+    public TapiController() {
         while(socket == null || !socket.isConnected()) {
             try {
                 initSocketAndStream();
                 listeningThread = new ListeningThread();
                 listeningThread.start();
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
                 try {
+                    System.out.println("Reconnecting in 3 seconds...");
                     Thread.sleep(3000);
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
             }
         }
+    }
+
+    public void setNewCallHandler(NewCallHandler newCallHandler) {
+        this.newCallHandler = newCallHandler;
     }
 
     public void listenFor(String number){
@@ -68,7 +73,7 @@ public class TapiController {
     }
 
     private void incomingPhonecall(String from, String to){
-        mainController.handleIncomingCall(from, to);
+        newCallHandler.handleIncomingCall(from, to);
     }
 
     private byte[] getMessageLength(String msg) {

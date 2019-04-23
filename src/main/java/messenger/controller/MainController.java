@@ -30,11 +30,28 @@ public class MainController {
     @Autowired
     public void setWebSocketController(WebSocketController webSocketController) {
         this.webSocketController = webSocketController;
+        this.webSocketController.setCallback(new WebSocketCallback() {
+            @Override
+            public String listenerSubscribed(String sessionId, String applicationSessionId) throws Exception {
+                return registerNewListener(sessionId, applicationSessionId);
+            }
+
+            @Override
+            public void listenerUnsubscribed(String sessionId) {
+                unregisterListener(sessionId);
+            }
+
+            @Override
+            public void askForNewCall(String sessionId, String number) {
+                initNewCall(sessionId, number);
+            }
+        });
     }
 
     @Autowired
     public void setTapiController(TapiController tapiController) {
         this.tapiController = tapiController;
+        this.tapiController.setNewCallHandler(this::handleIncomingCall);
     }
 
     @Autowired
@@ -70,7 +87,7 @@ public class MainController {
      * @param applicationSession Internal application session id. This id is used to find out phone number of a user logged in.
      * @return phone number associated with given application session id.
      */
-    public String registerNewListener(String sessionId, String applicationSession) {
+    public String registerNewListener(String sessionId, String applicationSession) throws Exception {
         String number = getNumberFromSessionFromDB(applicationSession);
         boolean overwrite = map.addPair(number, sessionId);
         if(!overwrite)
@@ -123,7 +140,7 @@ public class MainController {
      * @param sessionId application session id
      * @return phone number associated with usesr associated with given session id.
      */
-    private String getNumberFromSessionFromDB(String sessionId) {
+    private String getNumberFromSessionFromDB(String sessionId) throws Exception {
         return dbController.getNumberFromSession(sessionId);
     }
 

@@ -17,13 +17,13 @@ public class BeanConfiguration {
     }
 
     @Bean
-    TapiController tapiController(MainController mainController) {
-        return new TapiController(mainController);
+    TapiController tapiController() {
+        return new TapiController();
     }
 
     @Bean
-    WebSocketController webSocketController(MainController mainController) {
-        return new WebSocketController(mainController);
+    WebSocketController webSocketController() {
+        return new WebSocketController();
     }
 
 }
