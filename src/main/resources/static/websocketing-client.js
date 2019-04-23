@@ -37,6 +37,17 @@ function setConnecting() {
     $("#PHONE").addClass('t-Region--accent7');
 }
 
+function connect_only() {
+    var socket = new SockJS('172.16.35.51:8081/tapi-messenger'); //172.16.35.51:8081
+    stompClient = Stomp.over(socket);
+    stompClient.connect('mylogin', 'mypasswd', function (frame) {
+        stompClient.subscribe('/topic/is-listen-init', function (resp) { console.log(resp); });
+        introduce(apexSession);
+    }, function (frame) {
+        console.log('Error occured');
+        reportError();});
+}
+
 function connect() {
     var socket = new SockJS('172.16.35.51:8081/tapi-messenger'); //172.16.35.51:8081
     stompClient = Stomp.over(socket);
@@ -84,5 +95,5 @@ function callTo(number) {
     if(!stompClient) {
 	stompClient = parent.stompClient;
     }
-    stompClient.send("/tapi/call", JSON.stringify({'toNumber': number}))
+    stompClient.send("/tapi/call", {}, JSON.stringify({'toNumber': number}))
 }
