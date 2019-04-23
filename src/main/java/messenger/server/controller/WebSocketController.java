@@ -24,10 +24,21 @@ public class WebSocketController {
     @Autowired
     SimpMessagingTemplate template;
 
+    /**
+     * send caller data to given SimpSessionId
+     * @param listenerSessionId SimpSessionId to which data is sent
+     * @param caller object transferred over WebSocket.
+     */
     public void notifyIncomingCall(String listenerSessionId, Caller caller) {
         template.convertAndSend("/user/queue/incoming-call-user" + listenerSessionId, caller);
     }
 
+    /**
+     * Calls main controller to register new listener
+     * @param sessionId
+     * @param apexSession
+     * @return
+     */
     @MessageMapping("/listen")
     @SendTo("/topic/is-listen-init")
     public String startListen(@Header("simpSessionId") String sessionId, @Header("apex_session") String apexSession) { //getNumberFromSessionFromDB(sessionId)

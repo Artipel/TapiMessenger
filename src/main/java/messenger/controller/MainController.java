@@ -2,16 +2,20 @@ package messenger.controller;
 
 import messenger.server.config.WebSocketConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import messenger.server.controller.WebSocketController;
 import messenger.server.model.Caller;
 import messenger.tapiconnector.TapiController;
 import org.springframework.stereotype.Controller;
 
+/**
+ * Central class of TapiMessenger. Links websockets with TapiServer.
+ */
 @Controller
 public class MainController {
 
-    SessionPhoneMap map = new SessionPhoneMap();
+    private SessionPhoneMap map = new SessionPhoneMap();
 
     private WebSocketController webSocketController;
 
@@ -20,6 +24,7 @@ public class MainController {
     private WebSocketConfig webSocketConfig;
 
     @Autowired
+    @Qualifier("apex")
     private DBController dbController;
 
     @Autowired
@@ -42,9 +47,13 @@ public class MainController {
         });
     }
 
-    public MainController() {
-    }
+    public MainController() { }
 
+    /**
+     * Ask TapiServer to make a call to given number from a phone associated with given SimpSessionId.
+     * @param sessionId SimpSessionId of a user asking for a call
+     * @param toNumber Number to call to.
+     */
     public void initNewCall(String sessionId, String toNumber) {
         String fromNumber = map.getPhone(sessionId);
         if (fromNumber != null)
@@ -54,10 +63,12 @@ public class MainController {
     }
 
     /**
-     * Update session to phone map. If new phone then starts listening on Tapi Server.
-     * @param sessionId
-     * @param applicationSession
-     * @return phone number associated with this session
+     * Register session to phone map. Make a new association in a map.
+     * If phone number is new then it asks TapiServer to listen for this number.
+     * If it is already listened to then it does not communicate with TapiServer.
+     * @param sessionId SimpSessionId to which information will be sent.
+     * @param applicationSession Internal application session id. This id is used to find out phone number of a user logged in.
+     * @return phone number associated with given application session id.
      */
     public String registerNewListener(String sessionId, String applicationSession) {
         String number = getNumberFromSessionFromDB(applicationSession);
@@ -67,6 +78,11 @@ public class MainController {
         return number;
     }
 
+    /**
+     * Delete phone-SimpSessionId association from map.
+     * If it was the last listener for a number then TapiServer is asked to stop listening for this number.
+     * @param sessionId SimpSessionId of a listener that disconnected.
+     */
     public void unregisterListener(String sessionId) {
         String number = map.getPhone(sessionId);
         if (number != null) {
@@ -78,12 +94,21 @@ public class MainController {
         }
     }
 
+    /**
+     * Ask TapiServer to stop listening for a given phone number.
+     * @param number phone number to stop listen.
+     */
     public void stopListen(String number) {
         if(number != null) {
             tapiController.stopListenFor(number);
         }
     }
 
+    /**
+     * send information to all sessions associated with phone that new incoming call arrived.
+     * @param fromNumber caller phone number
+     * @param toNumber callee phone number (ringing phone)
+     */
     public void handleIncomingCall(String fromNumber, String toNumber) {
         String[] sessions = new String[map.getSessionsCount(toNumber)];
         map.getSessions(toNumber).toArray(sessions); // This one is to avoid concurrent modification exception
@@ -93,20 +118,21 @@ public class MainController {
         }
     }
 
+    /**
+     * call database controller to get number connected with given session id (applicatino session id).
+     * @param sessionId application session id
+     * @return phone number associated with usesr associated with given session id.
+     */
     private String getNumberFromSessionFromDB(String sessionId) {
         return dbController.getNumberFromSession(sessionId);
     }
 
+    /**
+     * Get specific information about owner of a given phone number
+     * @param number phone number of a searched person
+     * @return information about owner of a phone number
+     */
     private Caller getCallerData(String number) {
-        switch(number) {
-            case "601501401":
-                return new Caller("Pawel Krol", "601501401");
-            case "602502402":
-                return new Caller("Rafal Smolarek", "602502402");
-            case "603503403":
-                return new Caller("Artur Margielewski", "603503403");
-            default:
-                return new Caller("Unknown", number);
-        }
+        return new Caller("Unknown", number);
     }
 }

@@ -1,21 +1,11 @@
 package messenger.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+/**
+ * Implement this interface to connect TapiMessenger with another database.
+ * From implemented database connection information about phone number will be retrieved.
+ */
+public interface DBController {
 
-@Service
-public class DBController {
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
-
-    public String getNumberFromSession(String session) {
-        String result = jdbcTemplate.query("SELECT telefon " +
-                "FROM " +
-                "adm$uzytkownicy WHERE konto = ( SELECT user_name FROM APEX_WORKSPACE_SESSIONS WHERE apex_session_id = ? )", new Object[]{ session },
-                (rs, rownum) -> new String(rs.getString(1))).get(0);
-        return result;
-    }
+    public String getNumberFromSession(String session);
 
 }

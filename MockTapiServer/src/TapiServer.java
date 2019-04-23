@@ -7,6 +7,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
 
+/**
+ * This class is used to mimic telephone traffic and enables testing TapiMessenger without a switchboard (centrala)
+ */
 public class TapiServer {
 
     static Socket socket;
@@ -21,13 +24,6 @@ public class TapiServer {
 
         try {
             initSocketAndStream(44444);
-
-//            server = new ServerSocket(44444);
-//            System.out.println("Mock server: running on port 44444");
-//            socket = server.accept();
-//            in = socket.getInputStream();
-//            out = socket.getOutputStream();
-//            reader = new BufferedReader(new InputStreamReader(in));
 
             while(true) {
                 char[] buffer = new char[4];

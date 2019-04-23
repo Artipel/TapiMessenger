@@ -10,7 +10,7 @@ public class SessionPhoneMap {
     private HashMap<String, ArrayList<String>> phoneToSession = new HashMap<>();
 
     /**
-     *
+     * Create pair or append new session to phone number.
      * @param phone
      * @param session
      * @return true if previous value of session is overwritten

@@ -26,10 +26,20 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private DisconnectionHandler disconHandler;
 
+    /**
+     * setter for action invoked on client disconnection.
+     * @param disconHandler
+     */
     public void setDisconnectionHandler(DisconnectionHandler disconHandler) {
         this.disconHandler = disconHandler;
     }
 
+    /**
+     * Sets /tapi-messenger as endpoint
+     * Sets all origins as allowed
+     * Uses SockJS
+     * @param registry
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/tapi-messenger")
@@ -37,6 +47,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
     }
 
+    /**
+     * Creates brokers with prefixes: /topic and /user/queue
+     * Application prefix: /tapi
+     * User prefix /user
+     * @param registry
+     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic", "/user/queue");
@@ -48,4 +64,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void onSocketDisconnected(SessionDisconnectEvent event) {
         disconHandler.handleDisconnection(event);
     }
+
 }
