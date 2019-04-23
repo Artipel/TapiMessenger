@@ -9,6 +9,7 @@ function setCallerBadge(caller) {
        $("#PHONE .t-Region-header .t-Region-headerItems .t-Button").click()
    }
     $s("P1_PHONE", caller.phone);
+    $("#audiotag1")[0].play();
 }
 
 function resetCallerBadge() {
@@ -83,5 +84,5 @@ function callTo(number) {
     if(!stompClient) {
 	stompClient = parent.stompClient;
     }
-    stompClient.send("/tapi/call", {'apex_session': $v("pInstance")}, JSON.stringify({'toNumber': number}))
+    stompClient.send("/tapi/call", JSON.stringify({'toNumber': number}))
 }

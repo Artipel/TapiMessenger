@@ -58,16 +58,16 @@ public class WebSocketController {
     }
 
     @MessageMapping("/stop")
-    public void stopListen(@Header("simpSessionId") String sessionId, @Header("apex_session") String apexSession) {
-        System.out.println("Received request to STOP listen for session: " + sessionId + " apex session: " + apexSession);
+    public void stopListen(@Header("simpSessionId") String sessionId) {
+        System.out.println("Received request to STOP listen for session: " + sessionId);
         // mainController.stopListen(apexSession);
         callback.listenerUnsubscribed(sessionId);
     }
 
     @MessageMapping("/call")
     @SendTo("/topic/is-call-init")
-    public String initiateCall(CallMessage message, @Header("simpSessionId") String sessionId, @Header("apex_session") String apexSession) {
-        System.out.println("Received request to call to " + message.getToNumber() + " from sessionID: " + sessionId + " at apex session: " + apexSession);
+    public String initiateCall(CallMessage message, @Header("simpSessionId") String sessionId) {
+        System.out.println("Received request to call to " + message.getToNumber() + " from sessionID: " + sessionId);
         // mainController.initNewCall(sessionId, message.getToNumber());
         callback.askForNewCall(sessionId, message.getToNumber());
         return "CALLING NUMBER " + message.getToNumber();
