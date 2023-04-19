@@ -41,6 +41,7 @@ function connect_only() {
     var socket = new SockJS('172.16.35.51:8081/tapi-messenger'); //172.16.35.51:8081
     stompClient = Stomp.over(socket);
     stompClient.connect('mylogin', 'mypasswd', function (frame) {
+        var apexSession = $v("pInstance");
         stompClient.subscribe('/topic/is-listen-init', function (resp) { console.log(resp); });
         introduce(apexSession);
     }, function (frame) {
